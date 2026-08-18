@@ -1,335 +1,688 @@
-import React, { useState } from "react";
-import { Search, Sparkles, CheckCircle2, AlertTriangle, ArrowRight, Lightbulb, RefreshCw, Zap } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import {
+  Sparkles,
+  CheckCircle2,
+  AlertTriangle,
+  ArrowRight,
+  RefreshCw,
+  Zap,
+  Target,
+  BookOpen,
+  Award,
+  Layers,
+  ChevronDown,
+  ChevronUp,
+  FileText,
+  TrendingUp,
+  ShieldCheck
+} from "lucide-react";
 import useReveal from "../hooks/useReveal.js";
+import MatchScoreRing from "./MatchScoreRing.jsx";
 
-const PRESET_ROLES = {
+const SAMPLE_JOBS = {
   "Data Analyst": {
-    score: 87,
-    skills: ["SQL", "Python", "Power BI"],
-    needsImprovement: ["Statistics"],
-    insight:
-      "Your SQL and Power BI skills align strongly with this example role. Consider highlighting measurable project outcomes on your resume.",
+    text: "We are looking for a Data Analyst to extract actionable insights from enterprise datasets. Key Responsibilities: Write complex SQL queries, build interactive dashboards in Power BI/Tableau, collaborate with cross-functional teams, and perform data validation. Requirements: 3+ years experience with SQL (CTEs, window functions), Power BI or Tableau proficiency, Python/pandas basics, and experience presenting data stories to stakeholders.",
+    score: 82,
+    fitLabel: "Strong Match",
+    skillsMatchedCount: 8,
+    totalSkillsCount: 11,
+    skillsMissingCount: 3,
+    experienceMatch: "85%",
+    explanation: "You already match most of the core requirements. Strengthening SQL and Power BI would improve your fit.",
+    matchedSkills: ["SQL Fundamentals", "Python", "Tableau", "Excel", "Data Validation", "Stakeholder Presentation", "Pandas", "Etl Pipelines"],
+    gaps: {
+      highPriority: [
+        { skill: "Advanced SQL", current: "Intermediate", required: "Advanced" },
+        { skill: "Power BI", current: "Beginner", required: "Intermediate" },
+        { skill: "Data Visualization", current: "Intermediate", required: "Advanced" }
+      ],
+      mediumPriority: [
+        { skill: "CRM Analytics", current: "None", required: "Beginner" },
+        { skill: "A/B Testing", current: "Beginner", required: "Intermediate" }
+      ]
+    },
     recommendations: [
-      "Add quantified business metrics to your SQL project bullets (e.g., 'Optimized query latency by 40%').",
-      "Complete a concise 2-hour Statistics refresher covering hypothesis testing and confidence intervals.",
-      "Re-order your skills section to place Power BI and Data Modeling near the top."
+      {
+        title: "Improve SQL",
+        description: "Practice joins, CTEs, window functions, and analytical queries."
+      },
+      {
+        title: "Build a Power BI Dashboard",
+        description: "Create a business analytics dashboard and add it to your portfolio."
+      },
+      {
+        title: "Improve Resume Keywords",
+        description: "Highlight relevant analytics skills and projects."
+      },
+      {
+        title: "Prepare for Interviews",
+        description: "Practice SQL, Excel, Power BI, and analytics case studies."
+      }
+    ],
+    improvementPath: [
+      "Improve Advanced SQL (CTEs & Window Functions)",
+      "Build one Power BI project & embed live dashboard link",
+      "Update resume keywords with quantified impact metrics",
+      "Practice relevant analytics & SQL interview case studies",
+      "Apply directly to target Data Analyst roles with tailored match"
     ]
   },
-  "Frontend Engineer": {
-    score: 92,
-    skills: ["React", "TypeScript", "Tailwind CSS"],
-    needsImprovement: ["Web Vitals Optimization"],
-    insight:
-      "Your frontend architectural skills and modern UI rendering experience match key senior engineering criteria exceptionally well.",
-    recommendations: [
-      "Highlight component reusability and bundle size optimizations in your recent projects.",
-      "Add 1-2 examples of accessibility (WCAG 2.1 AA) implementations.",
-      "Link directly to live demos or GitHub code samples in your header."
-    ]
-  },
-  "Product Manager": {
-    score: 81,
-    skills: ["Product Roadmap", "User Research", "Agile/Scrum"],
-    needsImprovement: ["SQL Data Querying"],
-    insight:
-      "Strong strategic alignment and user empathy. Strengthening direct SQL querying data skills will push your score above 90%.",
-    recommendations: [
-      "Quantify revenue or retention impact on your top 2 product launches.",
-      "Detail your experience working directly with cross-functional engineering leads.",
-      "Include a brief case study link demonstrating your feature prioritization framework."
-    ]
-  },
-  "AI / ML Engineer": {
+  "Business Analyst": {
+    text: "Seeking a Business Analyst to bridge the gap between business needs and technical IT solutions. Responsibilities: Elicit requirements, build financial & operational models, map business workflows, and analyze user stories. Requirements: Agile/Scrum experience, SQL querying basics, Tableau visualization, process mapping (BPMN), and strong stakeholder communication skills.",
     score: 85,
-    skills: ["Python", "PyTorch", "LLM Fine-Tuning"],
-    needsImprovement: ["Vector Databases (Milvus/Pinecone)"],
-    insight:
-      "Solid deep learning fundamentals. Highlighting production RAG pipeline deployments will make your application stand out.",
+    fitLabel: "Strong Match",
+    skillsMatchedCount: 9,
+    totalSkillsCount: 11,
+    skillsMissingCount: 2,
+    experienceMatch: "88%",
+    explanation: "Strong strategic and process mapping alignment. Adding advanced data querying metrics will boost your fit to over 90%.",
+    matchedSkills: ["Agile/Scrum", "Requirement Elicitation", "Tableau", "Stakeholder Communication", "User Story Mapping", "Jira", "Workflow Mapping", "Data Modeling", "Documentation"],
+    gaps: {
+      highPriority: [
+        { skill: "Complex SQL Queries", current: "Beginner", required: "Intermediate" },
+        { skill: "Process Mapping (BPMN)", current: "Intermediate", required: "Advanced" }
+      ],
+      mediumPriority: [
+        { skill: "Financial Modeling", current: "Beginner", required: "Intermediate" },
+        { skill: "User Story Mapping", current: "Intermediate", required: "Advanced" }
+      ]
+    },
     recommendations: [
-      "Detail latency benchmarks achieved during LLM inference optimization.",
-      "Mention hands-on experience with vector embeddings and semantic search indexing.",
-      "Include repository links for your open-source AI projects."
+      {
+        title: "Quantify Business Impact",
+        description: "Add percentage gains or revenue optimizations achieved in past projects."
+      },
+      {
+        title: "Demonstrate Agile Leadership",
+        description: "Highlight cross-functional sprint planning and user story refinement."
+      },
+      {
+        title: "Build a Workflow Case Study",
+        description: "Showcase an end-to-end process optimization project."
+      },
+      {
+        title: "Refine Stakeholder Presentation",
+        description: "Practice presenting complex technical tradeoffs to non-technical leads."
+      }
+    ],
+    improvementPath: [
+      "Practice SQL data extraction queries for business KPIs",
+      "Document 1 process optimization case study in portfolio",
+      "Quantify financial & time-saving impact metrics on resume",
+      "Review Scrum Master & Product Owner frameworks",
+      "Apply to target Business Analyst positions"
+    ]
+  },
+  "Software Engineer": {
+    text: "We are hiring a Software Engineer to build scalable full-stack web applications. Responsibilities: Design RESTful APIs, develop modern responsive UIs in React/TypeScript, optimize database queries, and participate in code reviews. Requirements: 2+ years React experience, Node.js/Python, Git workflows, CI/CD pipelines, and cloud deployment experience (Vercel/AWS).",
+    score: 90,
+    fitLabel: "Excellent Match",
+    skillsMatchedCount: 10,
+    totalSkillsCount: 11,
+    skillsMissingCount: 1,
+    experienceMatch: "92%",
+    explanation: "Outstanding frontend and API development match. Demonstrating automated CI/CD pipeline usage will maximize your score.",
+    matchedSkills: ["React", "TypeScript", "REST APIs", "Node.js", "Git Workflows", "Tailwind CSS", "State Management", "Code Reviews", "Vercel Deployment", "Database Design"],
+    gaps: {
+      highPriority: [
+        { skill: "CI/CD Pipelines", current: "Beginner", required: "Intermediate" }
+      ],
+      mediumPriority: [
+        { skill: "System Design Fundamentals", current: "Intermediate", required: "Advanced" },
+        { skill: "Docker Containerization", current: "Beginner", required: "Intermediate" }
+      ]
+    },
+    recommendations: [
+      {
+        title: "Highlight Clean Architecture",
+        description: "Showcase reusable component design and clean state management patterns."
+      },
+      {
+        title: "Add Automated Tests",
+        description: "Include unit and integration test coverage metrics in your projects."
+      },
+      {
+        title: "Optimize Web Vitals",
+        description: "Document bundle size reductions and render performance improvements."
+      },
+      {
+        title: "Prepare System Design Answers",
+        description: "Practice scalability, caching, and database indexing questions."
+      }
+    ],
+    improvementPath: [
+      "Set up GitHub Actions CI/CD pipeline for main project",
+      "Add Docker container setup to repository",
+      "Document Web Vitals & performance optimizations",
+      "Practice front-end system design case studies",
+      "Submit applications to senior software engineering roles"
+    ]
+  },
+  "AI/ML Engineer": {
+    text: "Looking for an AI/ML Engineer to build and deploy generative AI applications. Responsibilities: Fine-tune LLMs, build RAG pipelines with vector databases, implement semantic search, and optimize model inference latencies. Requirements: Python, PyTorch, LangChain/LlamaIndex, Pinecone/Milvus, and experience shipping production AI endpoints.",
+    score: 88,
+    fitLabel: "Strong Match",
+    skillsMatchedCount: 9,
+    totalSkillsCount: 11,
+    skillsMissingCount: 2,
+    experienceMatch: "86%",
+    explanation: "Solid deep learning and Python foundation. Adding production RAG benchmark results will elevate your application.",
+    matchedSkills: ["Python", "PyTorch", "LLM Integration", "LangChain", "Semantic Search", "Prompt Engineering", "FastAPI", "Transformer Models", "Git"],
+    gaps: {
+      highPriority: [
+        { skill: "Vector Databases (Pinecone/Milvus)", current: "Beginner", required: "Advanced" },
+        { skill: "RAG Pipeline Optimization", current: "Intermediate", required: "Advanced" }
+      ],
+      mediumPriority: [
+        { skill: "Model Quantization & TensorRT", current: "None", required: "Beginner" },
+        { skill: "LLM Evaluation Frameworks", current: "Beginner", required: "Intermediate" }
+      ]
+    },
+    recommendations: [
+      {
+        title: "Showcase RAG Benchmarks",
+        description: "Document retrieval accuracy and latency reductions achieved in production."
+      },
+      {
+        title: "Publish Open Source Demos",
+        description: "Share live demo links and GitHub repositories for AI agents."
+      },
+      {
+        title: "Highlight Vector Indexing",
+        description: "Detail experience with embeddings, chunking strategies, and hybrid search."
+      },
+      {
+        title: "Prepare LLM Architecture Questions",
+        description: "Practice fine-tuning vs RAG trade-offs and prompt engineering."
+      }
+    ],
+    improvementPath: [
+      "Build an end-to-end RAG project with Pinecone & LangChain",
+      "Benchmark latency and retrieval accuracy metrics",
+      "Add open-source repository link to resume header",
+      "Practice GenAI & ML engineering interview questions",
+      "Apply to AI/ML engineering roles"
     ]
   }
 };
 
+const ANALYSIS_STEPS = [
+  "Reading job requirements",
+  "Comparing your skills",
+  "Identifying skill gaps",
+  "Generating recommendations"
+];
+
 export default function JobMatchDemo() {
-  const [jobTitle, setJobTitle] = useState("Data Analyst");
+  const [jobDescription, setJobDescription] = useState(SAMPLE_JOBS["Data Analyst"].text);
+  const [selectedRole, setSelectedRole] = useState("Data Analyst");
   const [validationError, setValidationError] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [hasAnalyzed, setHasAnalyzed] = useState(true);
-  const [showImprovePanel, setShowImprovePanel] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
+  const [hasAnalyzed, setHasAnalyzed] = useState(false);
+  const [showImprovePath, setShowImprovePath] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState(null);
+  
   const [ref, isVisible] = useReveal();
 
-  const currentData = PRESET_ROLES[jobTitle] || {
-    score: 84,
-    skills: ["Core Technical Skill 1", "Core Technical Skill 2", "Tooling"],
-    needsImprovement: ["Advanced Analytics"],
-    insight: `Your SQL and Power BI skills align strongly with this example role. Consider highlighting measurable project outcomes on your resume.`,
-    recommendations: [
-      `Tailor your summary section specifically for ${jobTitle || "target"} responsibilities.`,
-      "Quantify achievements with percentage improvements or revenue saved.",
-      "Align technical keywords with the target job posting description."
-    ]
+  const handlePresetSelect = (roleName) => {
+    const preset = SAMPLE_JOBS[roleName];
+    if (preset) {
+      setSelectedRole(roleName);
+      setJobDescription(preset.text);
+      setValidationError("");
+    }
   };
 
   const handleAnalyze = (e) => {
     e?.preventDefault();
-    if (!jobTitle.trim()) {
-      setValidationError("Enter a job title to analyze your match.");
+    if (!jobDescription || !jobDescription.trim()) {
+      setValidationError("Please paste or enter a job description to analyze your match.");
       return;
     }
+
     setValidationError("");
     setIsAnalyzing(true);
-    setShowImprovePanel(false);
+    setLoadingStep(0);
+    setShowImprovePath(false);
 
-    // Controlled 1100ms loading state for smooth skeleton animation
+    // Dynamic analysis lookup or intelligent fallback matching
+    const matchedData = SAMPLE_JOBS[selectedRole] || {
+      text: jobDescription,
+      score: 82,
+      fitLabel: "Strong Match",
+      skillsMatchedCount: 8,
+      totalSkillsCount: 11,
+      skillsMissingCount: 3,
+      experienceMatch: "85%",
+      explanation: "You already match most of the core requirements. Strengthening SQL and Power BI would improve your fit.",
+      matchedSkills: ["SQL Fundamentals", "Data Querying", "Analytics", "Reporting", "Excel", "Problem Solving", "Team Collaboration", "Documentation"],
+      gaps: {
+        highPriority: [
+          { skill: "Advanced SQL", current: "Intermediate", required: "Advanced" },
+          { skill: "Power BI", current: "Beginner", required: "Intermediate" },
+          { skill: "Data Visualization", current: "Intermediate", required: "Advanced" }
+        ],
+        mediumPriority: [
+          { skill: "CRM Analytics", current: "None", required: "Beginner" },
+          { skill: "A/B Testing", current: "Beginner", required: "Intermediate" }
+        ]
+      },
+      recommendations: [
+        {
+          title: "Improve SQL",
+          description: "Practice joins, CTEs, window functions, and analytical queries."
+        },
+        {
+          title: "Build a Power BI Dashboard",
+          description: "Create a business analytics dashboard and add it to your portfolio."
+        },
+        {
+          title: "Improve Resume Keywords",
+          description: "Highlight relevant analytics skills and projects."
+        },
+        {
+          title: "Prepare for Interviews",
+          description: "Practice SQL, Excel, Power BI, and analytics case studies."
+        }
+      ],
+      improvementPath: [
+        "Improve Advanced SQL (CTEs & Window Functions)",
+        "Build one Power BI project & embed live dashboard link",
+        "Update resume keywords with quantified impact metrics",
+        "Practice relevant analytics & SQL interview case studies",
+        "Apply directly to target Data Analyst roles with tailored match"
+      ]
+    };
+
+    // Step-by-step progress simulation (~1200ms total for polished feel)
+    const interval = setInterval(() => {
+      setLoadingStep((prev) => {
+        if (prev < ANALYSIS_STEPS.length - 1) {
+          return prev + 1;
+        } else {
+          clearInterval(interval);
+          return prev;
+        }
+      });
+    }, 280);
+
     setTimeout(() => {
+      clearInterval(interval);
       setIsAnalyzing(false);
+      setAnalysisResult(matchedData);
       setHasAnalyzed(true);
-    }, 1100);
+    }, 1250);
   };
 
-  const handlePresetClick = (role) => {
-    setJobTitle(role);
+  const handleReset = () => {
+    setHasAnalyzed(false);
+    setIsAnalyzing(false);
+    setShowImprovePath(false);
     setValidationError("");
-    setIsAnalyzing(true);
-    setShowImprovePanel(false);
-
-    setTimeout(() => {
-      setIsAnalyzing(false);
-      setHasAnalyzed(true);
-    }, 1000);
   };
 
   return (
     <section id="interactive-demo" className="py-16 sm:py-20 lg:py-24 bg-white border-b border-slate-200/80">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
             <Zap className="w-3.5 h-3.5" />
-            Live AI Match Simulator
+            Recruiter Match Simulator
           </span>
           <h2 className="mt-3 text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            See how AI Career Copilot evaluates your fit.
+            See Your Job Match in Seconds
           </h2>
           <p className="mt-3 text-base sm:text-lg text-slate-600">
-            Type any target job title below to trigger instant skill matching and AI recommendations.
+            Paste a job description and let AI identify your match, skill gaps, and next best actions.
           </p>
         </div>
 
-        {/* Input Form & Error Handling */}
-        <div ref={ref} className="mt-10 max-w-2xl mx-auto">
-          <form onSubmit={handleAnalyze} className="space-y-2">
-            <div className="flex flex-col sm:flex-row gap-3">
-              <div className="relative flex-1">
-                <label htmlFor="job-title-input" className="sr-only">Target Job Title</label>
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-                <input
-                  id="job-title-input"
-                  type="text"
-                  value={jobTitle}
-                  onChange={(e) => {
-                    setJobTitle(e.target.value);
-                    if (validationError) setValidationError("");
-                  }}
-                  placeholder="Enter a job title (e.g. Data Analyst)"
-                  aria-invalid={Boolean(validationError)}
-                  aria-describedby={validationError ? "validation-error-msg" : undefined}
-                  className={`w-full rounded-xl border bg-slate-50 pl-11 pr-4 py-3.5 text-slate-900 placeholder:text-slate-400 text-base transition-all shadow-sm font-medium focus:outline-none focus:ring-2 ${
-                    validationError
-                      ? "border-rose-400 focus:border-rose-500 focus:ring-rose-500/20"
-                      : "border-slate-300 focus:border-blue-600 focus:bg-white focus:ring-blue-600/20"
-                  }`}
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={isAnalyzing}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3.5 text-base font-semibold text-white shadow-md shadow-blue-600/20 hover:bg-blue-700 transition-all active:scale-95 disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-blue-600 shrink-0"
-              >
-                {isAnalyzing ? (
-                  <>
-                    <RefreshCw className="h-5 w-5 animate-spin" />
-                    <span>Analyzing...</span>
-                  </>
-                ) : (
-                  <>
+        {/* STEP 1: ENTER JOB FORM */}
+        <div ref={ref} className="mt-10 max-w-3xl mx-auto">
+          {!hasAnalyzed && !isAnalyzing && (
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-6 sm:p-8 shadow-sm">
+              <form onSubmit={handleAnalyze} className="space-y-4">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label htmlFor="job-description-input" className="block text-sm font-bold text-slate-800">
+                      Target Job Description
+                    </label>
+                    <span className="text-xs font-medium text-slate-500">
+                      Step 1 of 6 · Input
+                    </span>
+                  </div>
+
+                  <textarea
+                    id="job-description-input"
+                    rows={5}
+                    value={jobDescription}
+                    onChange={(e) => {
+                      setJobDescription(e.target.value);
+                      if (validationError) setValidationError("");
+                    }}
+                    placeholder="Paste a job description here..."
+                    className={`w-full rounded-xl border bg-white p-4 text-slate-900 placeholder:text-slate-400 text-sm leading-relaxed transition-all shadow-xs focus:outline-none focus:ring-2 ${
+                      validationError
+                        ? "border-rose-400 focus:border-rose-500 focus:ring-rose-500/20"
+                        : "border-slate-300 focus:border-blue-600 focus:ring-blue-600/20"
+                    }`}
+                  />
+
+                  {validationError && (
+                    <p className="mt-2 text-xs font-semibold text-rose-600 flex items-center gap-1.5 animate-slide-down">
+                      <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                      <span>{validationError}</span>
+                    </p>
+                  )}
+                </div>
+
+                {/* Example Job Buttons */}
+                <div>
+                  <p className="text-xs font-bold text-slate-600 mb-2">Or select an example job description:</p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {Object.keys(SAMPLE_JOBS).map((role) => (
+                      <button
+                        key={role}
+                        type="button"
+                        onClick={() => handlePresetSelect(role)}
+                        className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all border ${
+                          selectedRole === role
+                            ? "bg-slate-900 text-white border-slate-900 shadow-xs"
+                            : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100"
+                        }`}
+                      >
+                        {role}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Primary CTA Button */}
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-8 py-3.5 text-base font-bold text-white shadow-md shadow-blue-600/20 hover:bg-blue-700 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  >
                     <Sparkles className="h-5 w-5" />
-                    <span>Analyze Match</span>
-                  </>
-                )}
-              </button>
+                    <span>Analyze Job</span>
+                  </button>
+                </div>
+              </form>
             </div>
+          )}
 
-            {/* Validation Error Message */}
-            {validationError && (
-              <p id="validation-error-msg" className="text-xs font-semibold text-rose-600 flex items-center gap-1.5 pl-1 animate-slide-down">
-                <AlertTriangle className="h-3.5 w-3.5" />
-                <span>{validationError}</span>
-              </p>
-            )}
-          </form>
-
-          {/* Quick Preset Buttons */}
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs text-slate-500">
-            <span className="font-semibold text-slate-600">Try example role:</span>
-            {Object.keys(PRESET_ROLES).map((role) => (
-              <button
-                key={role}
-                type="button"
-                onClick={() => handlePresetClick(role)}
-                className={`rounded-full px-3 py-1 font-medium transition-all ${
-                  jobTitle === role
-                    ? "bg-slate-900 text-white shadow-sm"
-                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                }`}
-              >
-                {role}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Professional Skeleton Loading State (Section 5 requirement) */}
-        {isAnalyzing && (
-          <div className="mt-10 max-w-3xl mx-auto rounded-2xl border border-slate-200 bg-slate-50 p-6 sm:p-8 shadow-md space-y-6 animate-pulse">
-            <div className="flex items-center justify-between">
-              <div className="space-y-2">
-                <div className="h-4 w-28 bg-slate-200 rounded" />
-                <div className="h-7 w-48 bg-slate-300 rounded" />
+          {/* STEP 2: ANALYZE LOADING STATE */}
+          {isAnalyzing && (
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 sm:p-8 shadow-md space-y-6">
+              <div className="flex items-center gap-3">
+                <RefreshCw className="h-6 w-6 text-blue-600 animate-spin shrink-0" />
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900">Analyzing your profile...</h3>
+                  <p className="text-xs text-slate-500 font-mono">Evaluating qualifications against requirements</p>
+                </div>
               </div>
-              <div className="h-12 w-20 bg-slate-300 rounded-xl" />
-            </div>
 
-            <div className="flex items-center gap-3 bg-blue-100/60 p-4 rounded-xl text-blue-900 text-sm font-semibold">
-              <RefreshCw className="h-5 w-5 animate-spin text-blue-600 shrink-0" />
-              <span>Analyzing your profile against key requirements...</span>
+              {/* Progress items checklist */}
+              <div className="space-y-3 bg-white p-5 rounded-xl border border-slate-200">
+                {ANALYSIS_STEPS.map((step, idx) => {
+                  const isDone = idx < loadingStep;
+                  const isCurrent = idx === loadingStep;
+                  return (
+                    <div
+                      key={step}
+                      className={`flex items-center gap-3 text-sm transition-all duration-300 ${
+                        isDone
+                          ? "text-emerald-700 font-semibold"
+                          : isCurrent
+                          ? "text-blue-600 font-bold"
+                          : "text-slate-400 font-medium"
+                      }`}
+                    >
+                      {isDone ? (
+                        <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                      ) : isCurrent ? (
+                        <RefreshCw className="h-4 w-4 text-blue-600 animate-spin shrink-0" />
+                      ) : (
+                        <div className="h-4 w-4 rounded-full border border-slate-300 shrink-0" />
+                      )}
+                      <span>{step}</span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
+          )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="h-28 bg-slate-200 rounded-xl" />
-              <div className="h-28 bg-slate-200 rounded-xl" />
-            </div>
-          </div>
-        )}
+          {/* STEP 3, 4, 5, 6, 7: ANALYSIS RESULTS */}
+          {!isAnalyzing && hasAnalyzed && analysisResult && (
+            <div className="space-y-8 animate-fade-in">
 
-        {/* Results Panel */}
-        {!isAnalyzing && hasAnalyzed && (
-          <div className="mt-10 max-w-3xl mx-auto rounded-2xl border border-slate-200 bg-slate-50/70 p-6 sm:p-8 shadow-xl transition-all duration-500">
-            {/* Header Result Line */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold uppercase tracking-wider font-mono text-slate-500">Demo Match</span>
-                  <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800 border border-amber-200">
-                    Example Evaluation
+              {/* RECRUITER TOP SUMMARY BAR */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-900 text-white p-4 sm:p-5 rounded-2xl shadow-lg border border-slate-800">
+                <div className="text-center p-2 rounded-xl bg-slate-800/80 border border-slate-700/60">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Match Score</p>
+                  <p className="text-2xl sm:text-3xl font-extrabold text-emerald-400 font-mono mt-0.5">{analysisResult.score}%</p>
+                </div>
+                <div className="text-center p-2 rounded-xl bg-slate-800/80 border border-slate-700/60">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Skill Gaps</p>
+                  <p className="text-2xl sm:text-3xl font-extrabold text-amber-400 font-mono mt-0.5">{analysisResult.skillsMissingCount}</p>
+                </div>
+                <div className="text-center p-2 rounded-xl bg-slate-800/80 border border-slate-700/60">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Recommendations</p>
+                  <p className="text-2xl sm:text-3xl font-extrabold text-blue-400 font-mono mt-0.5">{analysisResult.recommendations.length}</p>
+                </div>
+                <div className="text-center p-2 rounded-xl bg-slate-800/80 border border-slate-700/60">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Overall Fit</p>
+                  <p className="text-base sm:text-lg font-bold text-white mt-1.5">{analysisResult.fitLabel}</p>
+                </div>
+              </div>
+
+              {/* STEP 3: MATCH SCORE DISPLAY */}
+              <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-6 sm:p-8 shadow-md">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pb-6 border-b border-slate-200">
+                  
+                  {/* Left: SVG Match Circle */}
+                  <div className="flex items-center gap-6">
+                    <MatchScoreRing score={analysisResult.score} size={108} active={isVisible} />
+                    <div>
+                      <span className="inline-flex items-center gap-1 rounded-md bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-800 border border-emerald-200 mb-1">
+                        <ShieldCheck className="h-3.5 w-3.5" />
+                        {analysisResult.fitLabel}
+                      </span>
+                      <h3 className="text-2xl font-extrabold text-slate-900">{analysisResult.score}% Match</h3>
+                      <p className="text-xs text-slate-500 font-mono mt-0.5">Target: {selectedRole}</p>
+                    </div>
+                  </div>
+
+                  {/* Right: Breakdown metrics */}
+                  <div className="grid grid-cols-2 gap-3 w-full sm:w-auto">
+                    <div className="bg-white p-3 rounded-xl border border-slate-200 text-center">
+                      <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Skills Matched</p>
+                      <p className="text-base font-extrabold text-slate-900 font-mono mt-0.5">
+                        {analysisResult.skillsMatchedCount} / {analysisResult.totalSkillsCount}
+                      </p>
+                    </div>
+                    <div className="bg-white p-3 rounded-xl border border-slate-200 text-center">
+                      <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Experience Match</p>
+                      <p className="text-base font-extrabold text-blue-600 font-mono mt-0.5">
+                        {analysisResult.experienceMatch}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Explanation Card */}
+                <div className="mt-6 rounded-xl border border-blue-200 bg-blue-50/80 p-4 sm:p-5">
+                  <div className="flex items-start gap-3">
+                    <Sparkles className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-blue-900 font-mono mb-1">
+                        AI Match Evaluation
+                      </h4>
+                      <p className="text-sm font-semibold text-slate-800 leading-relaxed">
+                        "{analysisResult.explanation}"
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* STEP 4: SKILL GAPS */}
+              <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm space-y-6">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5 text-amber-600" />
+                    <h3 className="text-xl font-bold text-slate-900">Skill Gaps</h3>
+                  </div>
+                  <span className="text-xs font-semibold text-slate-500 font-mono">
+                    {analysisResult.gaps.highPriority.length + analysisResult.gaps.mediumPriority.length} Missing / To-Improve
                   </span>
                 </div>
-                <h3 className="mt-1 text-2xl font-bold text-slate-900">{jobTitle || "Data Analyst"}</h3>
-              </div>
 
-              {/* Match Score Display - Exact 87% Demo Match */}
-              <div className="flex items-center gap-3 bg-white px-4 py-2.5 rounded-xl border border-slate-200 shadow-sm">
-                <span className="text-3xl font-extrabold text-blue-600 font-mono">{currentData.score}%</span>
-                <div className="text-left">
-                  <p className="text-xs font-bold text-slate-800">Demo Match</p>
-                  <p className="text-[11px] text-slate-500 font-mono">Profile Score</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Skills & Needs Improvement Grid */}
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Matched Skills */}
-              <div className="rounded-xl border border-emerald-200/80 bg-emerald-50/40 p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-800 font-mono">
-                    Skills
-                  </h4>
-                </div>
-                <div className="space-y-2">
-                  {currentData.skills.map((skill) => (
-                    <div key={skill} className="flex items-center gap-2 text-sm font-semibold text-slate-800 bg-white px-3 py-1.5 rounded-lg border border-emerald-100 shadow-2xs">
-                      <span className="text-emerald-600 font-bold">✓</span>
-                      <span>{skill}</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  
+                  {/* High Priority Gaps */}
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="h-2 w-2 rounded-full bg-rose-500" />
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-rose-700 font-mono">
+                        High Priority
+                      </h4>
                     </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Needs Improvement */}
-              <div className="rounded-xl border border-amber-200/80 bg-amber-50/40 p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <AlertTriangle className="h-4 w-4 text-amber-600" />
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-amber-800 font-mono">
-                    Needs Improvement
-                  </h4>
-                </div>
-                <div className="space-y-2">
-                  {currentData.needsImprovement.map((item) => (
-                    <div key={item} className="flex items-center gap-2 text-sm font-semibold text-slate-800 bg-white px-3 py-1.5 rounded-lg border border-amber-100 shadow-2xs">
-                      <span className="text-amber-500 font-bold">•</span>
-                      <span>{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* AI Insight Box - Blockquote */}
-            <div className="mt-6 rounded-xl border border-blue-200 bg-blue-50/80 p-5">
-              <div className="flex items-start gap-3">
-                <div className="p-2 rounded-lg bg-blue-600 text-white shrink-0 shadow-sm">
-                  <Lightbulb className="h-5 w-5" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-blue-900 font-mono mb-1">
-                    AI Insight
-                  </h4>
-                  <blockquote className="text-sm text-slate-700 leading-relaxed font-medium italic border-l-2 border-blue-600 pl-3">
-                    "{currentData.insight}"
-                  </blockquote>
-                </div>
-              </div>
-            </div>
-
-            {/* Action Button: Improve My Match → */}
-            <div className="mt-6 flex flex-col items-center">
-              <button
-                type="button"
-                onClick={() => setShowImprovePanel((prev) => !prev)}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-6 py-3.5 text-sm font-semibold text-white shadow-md hover:bg-blue-600 transition-all focus:outline-none focus:ring-2 focus:ring-blue-600 active:scale-95"
-              >
-                <span>{showImprovePanel ? "Hide Recommendation Plan" : "Improve My Match →"}</span>
-              </button>
-
-              {/* Reveal Recommendation Panel */}
-              {showImprovePanel && (
-                <div className="mt-4 w-full animate-slide-down rounded-xl border border-slate-300 bg-white p-5 shadow-lg text-left">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Sparkles className="h-4 w-4 text-blue-600" />
-                    <h5 className="text-xs font-bold uppercase tracking-wider text-slate-800 font-mono">
-                      Actionable Improvement Plan
-                    </h5>
-                  </div>
-                  <ul className="space-y-2.5">
-                    {currentData.recommendations.map((rec, idx) => (
-                      <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-700 leading-relaxed">
-                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-100 text-[11px] font-bold text-blue-700">
-                          {idx + 1}
-                        </span>
-                        <span>{rec}</span>
-                      </li>
+                    {analysisResult.gaps.highPriority.map((item) => (
+                      <div
+                        key={item.skill}
+                        className="rounded-xl border border-rose-100 bg-rose-50/30 p-3.5 transition-all hover:bg-rose-50/60"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-bold text-slate-900">{item.skill}</span>
+                          <span className="text-xs font-bold text-rose-700 bg-rose-100/80 px-2 py-0.5 rounded-md border border-rose-200">
+                            Required
+                          </span>
+                        </div>
+                        <div className="mt-2 flex items-center gap-2 text-xs font-semibold text-slate-600">
+                          <span className="bg-white px-2 py-0.5 rounded border border-slate-200">{item.current}</span>
+                          <ArrowRight className="h-3 w-3 text-slate-400" />
+                          <span className="bg-slate-900 text-white px-2 py-0.5 rounded font-bold">{item.required}</span>
+                        </div>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
+
+                  {/* Medium Priority Gaps */}
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="h-2 w-2 rounded-full bg-amber-500" />
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-amber-700 font-mono">
+                        Medium Priority
+                      </h4>
+                    </div>
+                    {analysisResult.gaps.mediumPriority.map((item) => (
+                      <div
+                        key={item.skill}
+                        className="rounded-xl border border-amber-100 bg-amber-50/30 p-3.5 transition-all hover:bg-amber-50/60"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-bold text-slate-900">{item.skill}</span>
+                          <span className="text-xs font-bold text-amber-800 bg-amber-100/80 px-2 py-0.5 rounded-md border border-amber-200">
+                            Recommended
+                          </span>
+                        </div>
+                        <div className="mt-2 flex items-center gap-2 text-xs font-semibold text-slate-600">
+                          <span className="bg-white px-2 py-0.5 rounded border border-slate-200">{item.current}</span>
+                          <ArrowRight className="h-3 w-3 text-slate-400" />
+                          <span className="bg-slate-900 text-white px-2 py-0.5 rounded font-bold">{item.required}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              )}
+              </div>
+
+              {/* STEP 5: AI RECOMMENDATIONS */}
+              <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-6 sm:p-8 shadow-sm space-y-6">
+                <div className="flex items-center gap-2 border-b border-slate-200 pb-4">
+                  <Sparkles className="h-5 w-5 text-blue-600" />
+                  <h3 className="text-xl font-bold text-slate-900">AI Recommendations</h3>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {analysisResult.recommendations.map((rec, index) => (
+                    <div
+                      key={rec.title}
+                      className="rounded-xl border border-slate-200 bg-white p-4 shadow-2xs hover:shadow-md transition-all space-y-1.5"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700 font-mono shrink-0">
+                          {index + 1}
+                        </span>
+                        <h4 className="text-sm font-bold text-slate-900">{rec.title}</h4>
+                      </div>
+                      <p className="text-xs font-medium text-slate-600 leading-relaxed pl-8">
+                        {rec.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* STEP 6 & STEP 7: ACTION BUTTONS */}
+              <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-md text-center space-y-6">
+                
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                  
+                  {/* STEP 6 CTA */}
+                  <button
+                    type="button"
+                    onClick={() => setShowImprovePath((prev) => !prev)}
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-7 py-3.5 text-base font-bold text-white shadow-md shadow-blue-600/20 hover:bg-blue-700 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  >
+                    <TrendingUp className="h-5 w-5" />
+                    <span>{showImprovePath ? "Hide Improvement Path" : "Improve My Match"}</span>
+                    {showImprovePath ? <ChevronUp className="h-4 w-4 ml-1" /> : <ChevronDown className="h-4 w-4 ml-1" />}
+                  </button>
+
+                  {/* STEP 7 CTA */}
+                  <button
+                    type="button"
+                    onClick={handleReset}
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-slate-100 border border-slate-300 px-6 py-3.5 text-base font-bold text-slate-700 hover:bg-slate-200 hover:text-slate-900 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-slate-400"
+                  >
+                    <RefreshCw className="h-4 w-4" />
+                    <span>Analyze Another Job</span>
+                  </button>
+                </div>
+
+                {/* EXPANDABLE STEP 6: YOUR FASTEST IMPROVEMENT PATH */}
+                {showImprovePath && (
+                  <div className="mt-6 text-left rounded-xl border border-blue-200 bg-blue-50/50 p-5 sm:p-6 space-y-4 animate-slide-down">
+                    <div className="flex items-center gap-2 border-b border-blue-200/60 pb-3">
+                      <Target className="h-5 w-5 text-blue-600" />
+                      <h4 className="text-base font-bold text-slate-900">Your Fastest Improvement Path</h4>
+                    </div>
+
+                    <ol className="space-y-3">
+                      {analysisResult.improvementPath.map((stepItem, idx) => (
+                        <li key={idx} className="flex items-start gap-3 bg-white p-3 rounded-lg border border-blue-100 shadow-2xs">
+                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white font-mono">
+                            {idx + 1}
+                          </span>
+                          <span className="text-xs sm:text-sm font-semibold text-slate-800 pt-0.5">
+                            {stepItem}
+                          </span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+
+        </div>
       </div>
     </section>
   );

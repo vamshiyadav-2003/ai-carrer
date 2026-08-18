@@ -79,10 +79,18 @@ export default function App() {
     setIsToastVisible(true);
   };
 
+  const handleTriggerToast = (msg) => {
+    setToastMessage(msg);
+    setIsToastVisible(true);
+  };
+
   return (
     <div className="min-h-screen overflow-x-hidden bg-slate-50 font-sans text-slate-900 selection:bg-blue-600 selection:text-white">
       {/* Navigation Bar */}
-      <Navbar onOpenCommandPalette={() => setIsCommandPaletteOpen(true)} />
+      <Navbar
+        onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+        onTriggerToast={handleTriggerToast}
+      />
 
       {/* Main Section Pipeline */}
       <main id="main-content">
@@ -121,7 +129,7 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <Footer />
+      <Footer onTriggerToast={handleTriggerToast} />
 
       {/* Easter Egg Cmd+K Spotlight Command Palette */}
       <CommandPalette

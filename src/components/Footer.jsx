@@ -9,7 +9,17 @@ const FOOTER_LINKS = [
   { label: "Contact", href: "#contact" },
 ];
 
-export default function Footer() {
+export default function Footer({ onTriggerToast }) {
+  const handleFooterLinkClick = (e, link) => {
+    if (link.href === "#privacy") {
+      e.preventDefault();
+      if (onTriggerToast) onTriggerToast("Privacy Policy: All data processed locally for demo mode.");
+    } else if (link.href === "#contact") {
+      e.preventDefault();
+      if (onTriggerToast) onTriggerToast("Contact Support: support@aicareercopilot.demo");
+    }
+  };
+
   return (
     <footer className="border-t border-slate-200 bg-white py-12 text-slate-600">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
@@ -30,6 +40,7 @@ export default function Footer() {
               <a
                 key={link.label}
                 href={link.href}
+                onClick={(e) => handleFooterLinkClick(e, link)}
                 className="text-slate-600 transition-colors hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded"
               >
                 {link.label}

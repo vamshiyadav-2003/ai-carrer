@@ -288,15 +288,69 @@ export default function DashboardPreview() {
 
               {activeTab === "skills" && (
                 <div className="space-y-4 animate-fade-up">
-                  <h3 className="text-lg font-bold text-slate-900">Skill Matrix</h3>
-                  <p className="text-xs text-slate-500">Identified proficiencies vs target job market demand.</p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-bold text-slate-900">Skill Matrix</h3>
+                      <p className="text-xs text-slate-500">Identified proficiencies vs target job market demand.</p>
+                    </div>
+                    <span className="text-xs font-mono font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
+                      4 Core Skills Verified
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {[
+                      { name: "SQL Data Querying", demand: "High Demand (98%)", status: "Advanced", color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+                      { name: "Python / Pandas", demand: "High Demand (92%)", status: "Proficient", color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+                      { name: "Power BI & Tableau", demand: "High Demand (95%)", status: "Proficient", color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+                      { name: "A/B Testing & Stats", demand: "Medium Demand (78%)", status: "In Progress", color: "bg-amber-50 text-amber-700 border-amber-200" },
+                    ].map((item) => (
+                      <div key={item.name} className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-slate-900">{item.name}</span>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${item.color}`}>
+                            {item.status}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 font-mono">{item.demand}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
               {activeTab === "profile" && (
                 <div className="space-y-4 animate-fade-up">
-                  <h3 className="text-lg font-bold text-slate-900">Career Profile & Objectives</h3>
-                  <p className="text-xs text-slate-500">Target role: Data Analyst / Analytics Engineer.</p>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-bold text-slate-900">Career Profile & Objectives</h3>
+                      <p className="text-xs text-slate-500 font-mono">Target role: Data Analyst / Analytics Engineer</p>
+                    </div>
+                    <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-200">
+                      Profile 87% Complete
+                    </span>
+                  </div>
+
+                  <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-4 space-y-3">
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      <div>
+                        <span className="text-[10px] font-bold uppercase text-slate-400 font-mono">Target Industry</span>
+                        <p className="font-bold text-slate-800 mt-0.5">Fintech & Enterprise SaaS</p>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-bold uppercase text-slate-400 font-mono">Experience Level</span>
+                        <p className="font-bold text-slate-800 mt-0.5">Mid-Senior (3.5 Years)</p>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-bold uppercase text-slate-400 font-mono">Preferred Work Type</span>
+                        <p className="font-bold text-slate-800 mt-0.5">Remote / Hybrid</p>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-bold uppercase text-slate-400 font-mono">AI Customization</span>
+                        <p className="font-bold text-blue-600 mt-0.5">Active Auto-Match</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
 

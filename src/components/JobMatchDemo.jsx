@@ -203,6 +203,51 @@ const SAMPLE_JOBS = {
       "Practice GenAI & ML engineering interview questions",
       "Apply to AI/ML engineering roles"
     ]
+  },
+  "Product Manager": {
+    text: "We are seeking a Product Manager to lead cross-functional product squads and define digital product roadmaps. Key Responsibilities: Conduct user research, author detailed PRDs, prioritize feature backlogs using data metrics, and collaborate with engineering and design. Requirements: 3+ years product management experience, Agile/Scrum fluency, user journey mapping, and analytical decision-making.",
+    score: 87,
+    fitLabel: "Strong Match",
+    skillsMatchedCount: 9,
+    totalSkillsCount: 11,
+    skillsMissingCount: 2,
+    experienceMatch: "89%",
+    explanation: "Your profile demonstrates strong alignment for the Product Manager position, showing core strengths in product strategy, roadmap planning, and stakeholder communication. Strengthening user behavioral analytics will maximize your score.",
+    matchedSkills: ["Product Strategy", "User Research", "Agile Roadmap", "Data-Driven Prioritization", "Stakeholder Alignment", "User Story Mapping", "Sprint Planning", "Feature Specs", "PRD Authoring"],
+    gaps: {
+      highPriority: [
+        { skill: "Product Roadmap & Backlog Prioritization", current: "Intermediate", required: "Advanced" },
+        { skill: "Metrics-Driven User Behavioral Analytics", current: "Beginner", required: "Intermediate" }
+      ],
+      mediumPriority: [
+        { skill: "A/B Experimentation & Feature Flagging", current: "Beginner", required: "Intermediate" }
+      ]
+    },
+    recommendations: [
+      {
+        title: "Quantify Product Impact",
+        description: "Add MAU growth, retention improvements, or conversion rate lifts to past feature launches."
+      },
+      {
+        title: "Showcase Data-Driven Prioritization",
+        description: "Detail your framework (e.g. RICE, MoSCoW) for managing competing feature requests."
+      },
+      {
+        title: "Demonstrate Cross-Functional Leadership",
+        description: "Highlight alignment between engineering, design, marketing, and executive leads."
+      },
+      {
+        title: "Prepare Product Case Study",
+        description: "Practice answering product design, strategy, and metric prioritization questions."
+      }
+    ],
+    improvementPath: [
+      "Define quantitative metrics for 2 recent product feature launches",
+      "Document 1 product PRD and roadmap case study in portfolio",
+      "Refactor resume keywords with RICE framework impact metrics",
+      "Practice mock Product Manager strategy & design interviews",
+      "Apply directly to target Product Manager roles with 87% match"
+    ]
   }
 };
 
@@ -220,26 +265,30 @@ function analyzeJobDescriptionText(text, selectedRoleHint = "") {
   // 1. Dynamic Role Identification
   let detectedTitle = "";
 
-  if (lower.includes("data analyst") || lower.includes("analytics engineer") || lower.includes("data analytics") || lower.includes("bi analyst")) {
+  if (lower.includes("product manager") || lower.includes("product owner") || lower.includes("prd") || lower.includes("roadmap")) {
+    detectedTitle = "Product Manager";
+  } else if (lower.includes("data analyst") || lower.includes("analytics engineer") || lower.includes("data analytics") || lower.includes("bi analyst")) {
     detectedTitle = "Data Analyst";
   } else if (lower.includes("ai engineer") || lower.includes("ml engineer") || lower.includes("machine learning") || lower.includes("ai/ml") || lower.includes("llm")) {
     detectedTitle = "AI / ML Engineer";
   } else if (lower.includes("software engineer") || lower.includes("frontend engineer") || lower.includes("full stack") || lower.includes("web developer")) {
     detectedTitle = "Software Engineer";
-  } else if (lower.includes("business analyst") || lower.includes("systems analyst") || lower.includes("product analyst")) {
+  } else if (lower.includes("business analyst") || lower.includes("systems analyst")) {
     detectedTitle = "Business Analyst";
   } else if (selectedRoleHint && SAMPLE_JOBS[selectedRoleHint]) {
     detectedTitle = selectedRoleHint;
   } else {
     // Score keyword density per role
     const dataScore = (lower.match(/data|sql|python|excel|power bi|tableau|analytics|visualization|google sheets|power query|dashboard/g) || []).length;
+    const pmScore = (lower.match(/product|roadmap|prd|user research|backlog|scrum|feature|retention|conversion|stakeholder/g) || []).length;
     const aiScore = (lower.match(/ai|ml|pytorch|llm|rag|vector|embeddings|model|deep learning|prompt/g) || []).length;
     const softwareScore = (lower.match(/react|typescript|node|frontend|api|javascript|web|git|css|software/g) || []).length;
-    const baScore = (lower.match(/business analyst|scrum|agile|requirements|bpmn|stakeholder|use case|jira/g) || []).length;
+    const baScore = (lower.match(/business analyst|requirements|bpmn|use case|jira/g) || []).length;
 
-    const maxScore = Math.max(dataScore, aiScore, softwareScore, baScore);
+    const maxScore = Math.max(dataScore, pmScore, aiScore, softwareScore, baScore);
     if (maxScore > 0) {
       if (maxScore === dataScore) detectedTitle = "Data Analyst";
+      else if (maxScore === pmScore) detectedTitle = "Product Manager";
       else if (maxScore === aiScore) detectedTitle = "AI / ML Engineer";
       else if (maxScore === softwareScore) detectedTitle = "Software Engineer";
       else detectedTitle = "Business Analyst";

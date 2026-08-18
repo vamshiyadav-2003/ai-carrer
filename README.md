@@ -5,6 +5,13 @@
 
 ---
 
+## 🚀 Live Demo
+
+**Live Website**: [https://ai-carrer-mu.vercel.app/](https://ai-carrer-mu.vercel.app/)  
+**GitHub Repository**: [https://github.com/vamshiyadav-2003/ai-carrer](https://github.com/vamshiyadav-2003/ai-carrer)
+
+---
+
 ## Overview
 
 **AI Career Copilot** is a high-grade frontend application built for job seekers to discover relevant opportunities, evaluate role compatibility, receive actionable resume insights, and track job applications across every hiring stage.
@@ -13,15 +20,15 @@ This project was built specifically for **Part 2 of the Acdyon Technologies Fron
 
 ---
 
-## Features
+## Key Features
 
-* **Live AI Job Match Simulator**: Instant client-side role fit evaluation with validation handling, loading skeleton states, skill match tags, AI insights, and an collapsible optimization plan.
-* **Resume Insights Engine**: Analysis panel featuring a `78% Demo Score`, checklist breakdown, and line-by-line phrasing and metric recommendations.
+* **Interactive AI Job Match Simulator**: Multi-role fit evaluation with real-time NLP text analysis, validation error handling, loading skeleton states, skill match tags, AI insights, and an interactive optimization plan.
+* **Resume Insights Engine**: Audit panel featuring a `78% Demo Score`, checklist breakdown, and line-by-line phrasing and metric recommendations.
 * **Application Tracker & Pipeline Workspace**: 4-stage Kanban tracking (`Applied`, `Interview`, `Shortlisted`, `Completed`) with interactive empty states, an **+ Add Application** modal, and toast feedback notifications.
 * **Why AI Career Copilot Workflow**: 4-phase architecture (`01 Discover` → `02 Understand` → `03 Improve` → `04 Track`) with desktop connecting line and mobile vertical stack.
 * **Built For Categories**: Dedicated role guidance cards for *Students*, *Career Switchers*, and *Early-Career Professionals*.
-* **Responsive & Accessible**: 100% responsive across 390px mobile and 1440px desktop layouts with visible focus rings (`outline-2`), semantic HTML5 elements, ARIA labels, and `prefers-reduced-motion` support.
-* **Spotlight Command Palette (Easter Egg)**: `Cmd+K` or `Ctrl+K` keyboard launcher for fast section jumping.
+* **Responsive & Accessible**: 100% responsive across 390px mobile and 1440px desktop layouts with visible focus rings (`outline-2`), semantic HTML5 elements, ARIA labels, keyboard navigation (Arrow keys + Enter + Escape), and `prefers-reduced-motion` support.
+* **Spotlight Command Palette (Easter Egg)**: `Cmd+K` or `Ctrl+K` keyboard launcher for fast section navigation.
 
 ---
 
@@ -32,18 +39,6 @@ This project was built specifically for **Part 2 of the Acdyon Technologies Fron
 * **Tailwind CSS 3** — Modern utility-first SaaS styling system
 * **Lucide React** — Professional SVG icon system
 * **JavaScript (ES Modules)** — Modern ES6+ syntax
-
----
-
-## Screenshots
-
-> *Replace placeholder paths below with exported image screenshots when deploying:*
-
-* **Desktop Homepage**: `public/screenshots/hero-desktop.png`
-* **AI Match Interaction**: `public/screenshots/ai-match-simulator.png`
-* **Resume Insights Panel**: `public/screenshots/resume-insights.png`
-* **Application Tracker**: `public/screenshots/application-tracker.png`
-* **Mobile View (390px)**: `public/screenshots/mobile-view.png`
 
 ---
 
@@ -72,20 +67,18 @@ To create an optimized production bundle:
 npm run build
 ```
 
-The output files will be compiled into the `dist/` directory.
+The output files will be compiled into the `dist/` directory with zero build errors.
 
 ---
 
 ## Deployment (Vercel)
 
-This project is pre-configured for seamless one-click Vercel deployment:
+This project is deployed on Vercel with single-page application SPA rewrite configuration (`vercel.json`):
 
-1. Push your repository to **GitHub**.
-2. Log into [Vercel](https://vercel.com) and click **Add New > Project**.
-3. Import the repository. Vercel automatically detects **Vite** settings:
+1. **Live Deployment**: [https://ai-carrer-mu.vercel.app/](https://ai-carrer-mu.vercel.app/)
+2. **Build Settings**:
    - **Build Command**: `npm run build`
    - **Output Directory**: `dist`
-4. Click **Deploy**.
 
 ---
 
@@ -93,6 +86,7 @@ This project is pre-configured for seamless one-click Vercel deployment:
 
 In accordance with Acdyon assessment guidelines:
 
-* **Generated**: Initial component structural boilerplate and example dataset entries (`Data Analyst`, `Frontend Engineer`, `Product Manager`).
-* **Manually Reviewed & Modified**: Reviewed all copy for 100% data honesty, configured Tailwind color palette tokens (`#0F172A`, `#2563EB`), added validation error states, loading skeletons, modal forms, and tested keyboard navigation (`Cmd+K`).
+* **Generated**: Initial component structural boilerplate and example dataset entries (`Data Analyst`, `Software Engineer`, `Product Manager`, `Business Analyst`, `AI/ML Engineer`).
+* **Manually Reviewed & Modified**: Reviewed all copy for 100% data honesty, configured Tailwind color palette tokens (`#0F172A`, `#2563EB`), added validation error states, loading skeletons, modal forms, and tested keyboard navigation (`Cmd+K`, Arrow keys, Escape key).
 * **Verified Personally**: Executed `npm run dev` and `npm run build` with zero warnings/errors, and verified 390px mobile and 1440px desktop layouts.
+

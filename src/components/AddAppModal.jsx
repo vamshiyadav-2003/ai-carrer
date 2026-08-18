@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { X, PlusCircle, Building2, Briefcase, MapPin, CheckCircle2 } from "lucide-react";
 
 export default function AddAppModal({ isOpen, onClose, onAddApplication }) {
@@ -7,6 +7,20 @@ export default function AddAppModal({ isOpen, onClose, onAddApplication }) {
   const [status, setStatus] = useState("applied");
   const [location, setLocation] = useState("Remote · Full-time");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+    if (isOpen) {
+      window.addEventListener("keydown", handleKeyDown);
+    }
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 

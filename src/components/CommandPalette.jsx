@@ -13,27 +13,6 @@ export default function CommandPalette({ isOpen, onClose }) {
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        if (isOpen) {
-          onClose();
-        } else {
-          // Open signal
-        }
-      }
-      if (e.key === "Escape" && isOpen) {
-        onClose();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
-
   const filteredItems = COMMAND_ITEMS.filter((item) =>
     item.label.toLowerCase().includes(query.toLowerCase()) ||
     item.category.toLowerCase().includes(query.toLowerCase())
@@ -43,6 +22,33 @@ export default function CommandPalette({ isOpen, onClose }) {
     onClose();
     window.location.href = href;
   };
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handlePaletteKeys = (e) => {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setSelectedIndex((prev) => (prev + 1) % Math.max(1, filteredItems.length));
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setSelectedIndex((prev) => (prev - 1 + filteredItems.length) % Math.max(1, filteredItems.length));
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        if (filteredItems[selectedIndex]) {
+          handleSelect(filteredItems[selectedIndex].href);
+        }
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", handlePaletteKeys);
+    return () => window.removeEventListener("keydown", handlePaletteKeys);
+  }, [isOpen, filteredItems, selectedIndex, onClose]);
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 bg-slate-900/60 backdrop-blur-sm animate-fade-up">

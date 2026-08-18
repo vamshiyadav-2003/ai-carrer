@@ -28,35 +28,35 @@ const SAMPLE_JOBS = {
     totalSkillsCount: 11,
     skillsMissingCount: 3,
     experienceMatch: "85%",
-    explanation: "You already match most of the core requirements. Strengthening SQL and Power BI would improve your fit.",
-    matchedSkills: ["SQL Fundamentals", "Python", "Tableau", "Excel", "Data Validation", "Stakeholder Presentation", "Pandas", "Etl Pipelines"],
+    explanation: "Your profile demonstrates strong alignment for the Data Analyst position, showing core strengths in SQL, Python, Excel, and Data Visualization. Strengthening Advanced SQL and Power BI will maximize your match score.",
+    matchedSkills: ["SQL Fundamentals", "Python", "Tableau", "Excel", "Data Validation", "Stakeholder Presentation", "Pandas", "ETL Pipelines"],
     gaps: {
       highPriority: [
-        { skill: "Advanced SQL", current: "Intermediate", required: "Advanced" },
-        { skill: "Power BI", current: "Beginner", required: "Intermediate" },
-        { skill: "Data Visualization", current: "Intermediate", required: "Advanced" }
+        { skill: "Advanced SQL (CTEs & Window Functions)", current: "Intermediate", required: "Advanced" },
+        { skill: "Power BI & DAX Modeling", current: "Beginner", required: "Intermediate" },
+        { skill: "Data Visualization Best Practices", current: "Intermediate", required: "Advanced" }
       ],
       mediumPriority: [
-        { skill: "CRM Analytics", current: "None", required: "Beginner" },
-        { skill: "A/B Testing", current: "Beginner", required: "Intermediate" }
+        { skill: "Automated Data Pipelines (Power Query)", current: "Beginner", required: "Intermediate" },
+        { skill: "A/B Testing & Statistical Modeling", current: "Beginner", required: "Intermediate" }
       ]
     },
     recommendations: [
       {
-        title: "Improve SQL",
-        description: "Practice joins, CTEs, window functions, and analytical queries."
+        title: "Improve Advanced SQL",
+        description: "Practice complex CTEs, window functions, and analytical query optimization."
       },
       {
         title: "Build a Power BI Dashboard",
-        description: "Create a business analytics dashboard and add it to your portfolio."
+        description: "Create an interactive business analytics dashboard and add it to your portfolio."
       },
       {
-        title: "Improve Resume Keywords",
-        description: "Highlight relevant analytics skills and projects."
+        title: "Enhance Resume Keywords",
+        description: "Highlight Python, SQL, Excel, and Power BI metrics in your work history."
       },
       {
-        title: "Prepare for Interviews",
-        description: "Practice SQL, Excel, Power BI, and analytics case studies."
+        title: "Prepare Data Analyst Case Studies",
+        description: "Practice answering business scenario questions using SQL, Excel, and Power BI."
       }
     ],
     improvementPath: [
@@ -214,111 +214,176 @@ const ANALYSIS_STEPS = [
 ];
 
 // Helper to dynamically analyze custom pasted job descriptions
-function analyzeJobDescriptionText(text) {
+function analyzeJobDescriptionText(text, selectedRoleHint = "") {
   const lower = text.toLowerCase();
 
-  // Dynamic Skill Detection
-  const knownSkills = [
-    { name: "SQL Data Querying", matched: lower.includes("sql") || lower.includes("query") || lower.includes("database") },
-    { name: "Python Scripting", matched: lower.includes("python") || lower.includes("pandas") || lower.includes("numpy") },
-    { name: "Power BI & Dashboards", matched: lower.includes("power bi") || lower.includes("tableau") || lower.includes("dashboard") },
-    { name: "React & Modern Web", matched: lower.includes("react") || lower.includes("frontend") || lower.includes("javascript") || lower.includes("typescript") },
-    { name: "AI / LLM Engineering", matched: lower.includes("ai") || lower.includes("ml") || lower.includes("pytorch") || lower.includes("llm") || lower.includes("rag") },
-    { name: "Agile & Requirements", matched: lower.includes("agile") || lower.includes("scrum") || lower.includes("business") || lower.includes("requirements") },
-    { name: "Excel & Financial Analysis", matched: lower.includes("excel") || lower.includes("finance") || lower.includes("reporting") },
-    { name: "Git & Version Control", matched: lower.includes("git") || lower.includes("github") || lower.includes("version control") },
-    { name: "A/B Testing & Statistics", matched: lower.includes("testing") || lower.includes("a/b") || lower.includes("stat") || lower.includes("experiment") },
-    { name: "Cloud & DevOps", matched: lower.includes("aws") || lower.includes("cloud") || lower.includes("docker") || lower.includes("ci/cd") }
+  // 1. Dynamic Role Identification
+  let detectedTitle = "";
+
+  if (lower.includes("data analyst") || lower.includes("analytics engineer") || lower.includes("data analytics") || lower.includes("bi analyst")) {
+    detectedTitle = "Data Analyst";
+  } else if (lower.includes("ai engineer") || lower.includes("ml engineer") || lower.includes("machine learning") || lower.includes("ai/ml") || lower.includes("llm")) {
+    detectedTitle = "AI / ML Engineer";
+  } else if (lower.includes("software engineer") || lower.includes("frontend engineer") || lower.includes("full stack") || lower.includes("web developer")) {
+    detectedTitle = "Software Engineer";
+  } else if (lower.includes("business analyst") || lower.includes("systems analyst") || lower.includes("product analyst")) {
+    detectedTitle = "Business Analyst";
+  } else if (selectedRoleHint && SAMPLE_JOBS[selectedRoleHint]) {
+    detectedTitle = selectedRoleHint;
+  } else {
+    // Score keyword density per role
+    const dataScore = (lower.match(/data|sql|python|excel|power bi|tableau|analytics|visualization|google sheets|power query|dashboard/g) || []).length;
+    const aiScore = (lower.match(/ai|ml|pytorch|llm|rag|vector|embeddings|model|deep learning|prompt/g) || []).length;
+    const softwareScore = (lower.match(/react|typescript|node|frontend|api|javascript|web|git|css|software/g) || []).length;
+    const baScore = (lower.match(/business analyst|scrum|agile|requirements|bpmn|stakeholder|use case|jira/g) || []).length;
+
+    const maxScore = Math.max(dataScore, aiScore, softwareScore, baScore);
+    if (maxScore > 0) {
+      if (maxScore === dataScore) detectedTitle = "Data Analyst";
+      else if (maxScore === aiScore) detectedTitle = "AI / ML Engineer";
+      else if (maxScore === softwareScore) detectedTitle = "Software Engineer";
+      else detectedTitle = "Business Analyst";
+    } else {
+      detectedTitle = "Data Analyst";
+    }
+  }
+
+  // 2. Extracted Skills Taxonomy
+  const candidateSkills = [
+    { name: "SQL", aliases: ["sql", "query", "queries", "database"] },
+    { name: "Python", aliases: ["python", "pandas", "numpy"] },
+    { name: "Excel", aliases: ["excel", "spreadsheet", "vlookup", "pivot"] },
+    { name: "Power BI", aliases: ["power bi", "powerbi", "dax"] },
+    { name: "Tableau", aliases: ["tableau"] },
+    { name: "Data Analysis", aliases: ["data analysis", "analytics", "data insights", "analytical"] },
+    { name: "Data Visualization", aliases: ["visualization", "visualizations", "charts", "dashboard"] },
+    { name: "Google Sheets", aliases: ["google sheets", "sheets"] },
+    { name: "Power Query", aliases: ["power query", "powerquery", "etl"] },
+    { name: "Automation", aliases: ["automation", "automate", "scripting"] },
+    { name: "APIs & Integration", aliases: ["api", "apis", "integration", "pipeline"] },
+    { name: "AI Productivity Tools", aliases: ["ai tools", "chatgpt", "copilot", "generative ai"] },
+    { name: "React & Modern Web", aliases: ["react", "typescript", "javascript", "web"] },
+    { name: "PyTorch & LLMs", aliases: ["pytorch", "llm", "rag", "langchain"] },
+    { name: "Agile & Requirements", aliases: ["agile", "scrum", "requirements", "stakeholder"] },
+    { name: "Git & Version Control", aliases: ["git", "github", "version control"] },
   ];
 
-  const matchedSkills = knownSkills.filter((s) => s.matched).map((s) => s.name);
-  if (matchedSkills.length === 0) {
-    matchedSkills.push("Problem Solving", "Domain Analysis", "Cross-Functional Collaboration", "Documentation", "Project Coordination");
+  // Filter skills present in the submitted text
+  const presentSkills = candidateSkills.filter((skill) =>
+    skill.aliases.some((alias) => lower.includes(alias))
+  );
+
+  const matchedSkillsNames = presentSkills.map((s) => s.name);
+
+  // Fallback skills if text had general wording
+  if (matchedSkillsNames.length === 0) {
+    if (detectedTitle === "Data Analyst") {
+      matchedSkillsNames.push("SQL", "Python", "Excel", "Data Analysis", "Data Visualization");
+    } else if (detectedTitle === "AI / ML Engineer") {
+      matchedSkillsNames.push("Python", "PyTorch", "LLM Integration", "Semantic Search", "Prompt Engineering");
+    } else if (detectedTitle === "Software Engineer") {
+      matchedSkillsNames.push("React", "TypeScript", "REST APIs", "Git Workflows", "Node.js");
+    } else {
+      matchedSkillsNames.push("Requirements Elicitation", "Stakeholder Communication", "Agile/Scrum", "Tableau", "User Stories");
+    }
   }
 
-  // Detect role title based on text contents
-  let detectedTitle = "Custom Targeted Role";
-  if (lower.includes("frontend") || lower.includes("react") || lower.includes("web") || lower.includes("software")) {
-    detectedTitle = "Software / Frontend Engineer";
-  } else if (lower.includes("ai") || lower.includes("machine learning") || lower.includes("llm") || lower.includes("pytorch")) {
-    detectedTitle = "AI / ML Engineer";
-  } else if (lower.includes("business") || lower.includes("process") || lower.includes("stakeholder") || lower.includes("scrum")) {
-    detectedTitle = "Business Analyst";
-  } else if (lower.includes("data") || lower.includes("sql") || lower.includes("analytics") || lower.includes("tableau")) {
-    detectedTitle = "Data Analyst";
+  // Role-Specific Skill Gaps
+  const highPriorityGaps = [];
+  const mediumPriorityGaps = [];
+
+  if (detectedTitle === "Data Analyst") {
+    if (!lower.includes("sql") || lower.includes("advanced sql") || lower.includes("cte")) {
+      highPriorityGaps.push({ skill: "Advanced SQL (CTEs & Window Functions)", current: "Intermediate", required: "Advanced" });
+    }
+    if (!lower.includes("power bi") && !lower.includes("dax")) {
+      highPriorityGaps.push({ skill: "Power BI & DAX Data Modeling", current: "Beginner", required: "Intermediate" });
+    }
+    if (!lower.includes("automation") && !lower.includes("etl")) {
+      mediumPriorityGaps.push({ skill: "Automated Data Pipelines (Power Query)", current: "Beginner", required: "Intermediate" });
+    }
+    if (!lower.includes("testing") && !lower.includes("a/b")) {
+      mediumPriorityGaps.push({ skill: "A/B Testing & Statistical Modeling", current: "Beginner", required: "Intermediate" });
+    }
+    if (highPriorityGaps.length === 0) {
+      highPriorityGaps.push({ skill: "Advanced Power Query & DAX Modeling", current: "Intermediate", required: "Advanced" });
+    }
+    if (mediumPriorityGaps.length === 0) {
+      mediumPriorityGaps.push({ skill: "Automated Python Data Integration", current: "Beginner", required: "Intermediate" });
+    }
+  } else if (detectedTitle === "AI / ML Engineer") {
+    highPriorityGaps.push({ skill: "Vector Databases (Pinecone/Milvus)", current: "Beginner", required: "Advanced" });
+    highPriorityGaps.push({ skill: "RAG Pipeline Latency Optimization", current: "Intermediate", required: "Advanced" });
+    mediumPriorityGaps.push({ skill: "Model Quantization & TensorRT", current: "None", required: "Beginner" });
+    mediumPriorityGaps.push({ skill: "LLM Evaluation Frameworks", current: "Beginner", required: "Intermediate" });
+  } else if (detectedTitle === "Software Engineer") {
+    highPriorityGaps.push({ skill: "Automated CI/CD Pipelines", current: "Beginner", required: "Intermediate" });
+    highPriorityGaps.push({ skill: "System Design & Scalability", current: "Intermediate", required: "Advanced" });
+    mediumPriorityGaps.push({ skill: "Docker Containerization", current: "Beginner", required: "Intermediate" });
+  } else {
+    // Business Analyst
+    highPriorityGaps.push({ skill: "Complex SQL Data Extraction Queries", current: "Beginner", required: "Intermediate" });
+    highPriorityGaps.push({ skill: "Process Mapping (BPMN 2.0)", current: "Intermediate", required: "Advanced" });
+    mediumPriorityGaps.push({ skill: "Financial & Operational Modeling", current: "Beginner", required: "Intermediate" });
   }
 
-  // Calculate dynamic score (76% to 94%) based on word count and keyword matches
-  const wordCount = text.trim().split(/\s+/).length;
-  const matchBonus = Math.min(18, matchedSkills.length * 3);
-  const lengthBonus = Math.min(6, Math.floor(wordCount / 15));
-  const score = Math.min(95, Math.max(76, 72 + matchBonus + lengthBonus));
+  // Synchronized Metrics Calculation
+  const totalSkillsCount = 11;
+  const skillsMatchedCount = Math.min(10, Math.max(7, matchedSkillsNames.length + 2));
+  const skillsMissingCount = highPriorityGaps.length + mediumPriorityGaps.length;
+
+  const score = Math.min(96, Math.max(78, 75 + skillsMatchedCount * 2 + (text.length % 5)));
   const fitLabel = score >= 88 ? "Excellent Match" : score >= 81 ? "Strong Match" : "Good Match";
+  const experienceMatch = `${Math.min(96, score + 3)}%`;
 
-  // Dynamic Skill Gaps based on missing technologies
-  const highPriority = [];
-  const mediumPriority = [];
+  // Concise, relevant explanation
+  const topMatchedStr = matchedSkillsNames.slice(0, 4).join(", ");
+  const topGapStr = highPriorityGaps[0]?.skill || "Advanced Skills";
 
-  if (!lower.includes("sql")) {
-    highPriority.push({ skill: "Advanced SQL Querying", current: "Intermediate", required: "Advanced" });
-  }
-  if (!lower.includes("power bi") && !lower.includes("tableau") && !lower.includes("dashboard")) {
-    highPriority.push({ skill: "BI & Executive Dashboarding", current: "Beginner", required: "Intermediate" });
-  }
-  if (!lower.includes("python") && !lower.includes("script")) {
-    mediumPriority.push({ skill: "Automated Data Scripting (Python)", current: "Beginner", required: "Intermediate" });
-  }
-  if (!lower.includes("testing") && !lower.includes("a/b")) {
-    mediumPriority.push({ skill: "A/B Testing & Statistical Rigor", current: "None", required: "Beginner" });
-  }
+  const explanation = `Your profile demonstrates strong alignment for the ${detectedTitle} position, showing key strength in ${topMatchedStr}. Strengthening ${topGapStr} will maximize your match score.`;
 
-  if (highPriority.length === 0) {
-    highPriority.push({ skill: "Advanced System Architecture", current: "Intermediate", required: "Advanced" });
-  }
-  if (mediumPriority.length === 0) {
-    mediumPriority.push({ skill: "CI/CD Pipeline Integration", current: "Beginner", required: "Intermediate" });
-  }
-
+  // Consistent Recommendations
   const recommendations = [
     {
       title: `Tailor Bullet Points for ${detectedTitle}`,
-      description: `Incorporate key terms found in this job description (${matchedSkills.slice(0, 3).join(", ")}) into your achievements.`
+      description: `Highlight ${topMatchedStr} in your experience section with quantified outcome metrics.`
     },
     {
-      title: `Bridge ${highPriority[0].skill}`,
-      description: `Complete a targeted project demonstrating ${highPriority[0].skill} to move from ${highPriority[0].current} to ${highPriority[0].required}.`
+      title: `Bridge ${topGapStr}`,
+      description: `Complete a practical project focusing on ${topGapStr} to move from ${highPriorityGaps[0]?.current || "Intermediate"} to ${highPriorityGaps[0]?.required || "Advanced"}.`
     },
     {
-      title: "Add Quantifiable Impact Metrics",
-      description: "Quantify your achievements with percentage improvements, time saved, or revenue generated."
+      title: "Quantify Business Impact",
+      description: "Ensure bullet points quantify achievements with specific percentages, time saved, or efficiency gains."
     },
     {
       title: `Prepare ${detectedTitle} Technical Case Studies`,
-      description: "Practice answering role-specific scenario questions and system design/analytical trade-offs."
+      description: `Practice answering role-specific scenario questions and analytical trade-offs for ${detectedTitle} interviews.`
     }
   ];
 
+  // Consistent Improvement Path
   const improvementPath = [
-    `Strengthen ${highPriority[0].skill} competency`,
-    `Build a portfolio proof-of-concept covering ${matchedSkills.slice(0, 2).join(" and ")}`,
-    `Refactor resume phrasing to highlight keywords present in this custom job posting`,
+    `Master ${topGapStr} concepts and practical applications`,
+    `Build a portfolio project demonstrating ${matchedSkillsNames.slice(0, 2).join(" & ")}`,
+    `Refactor resume phrasing to highlight keywords present in this ${detectedTitle} job posting`,
     `Conduct mock interview practice targeting ${detectedTitle} technical standards`,
-    `Submit application with dynamic tailored match score of ${score}%`
+    `Submit application with verified match score of ${score}%`
   ];
 
   return {
     text: text,
     score: score,
     fitLabel: fitLabel,
-    skillsMatchedCount: Math.min(11, matchedSkills.length + 3),
-    totalSkillsCount: 11,
-    skillsMissingCount: highPriority.length + mediumPriority.length,
-    experienceMatch: `${Math.min(96, score + 3)}%`,
-    explanation: `Your profile matches key requirements for ${detectedTitle}. Addressing ${highPriority[0].skill} will maximize your fit score.`,
-    matchedSkills: matchedSkills,
+    skillsMatchedCount: skillsMatchedCount,
+    totalSkillsCount: totalSkillsCount,
+    skillsMissingCount: skillsMissingCount,
+    experienceMatch: experienceMatch,
+    explanation: explanation,
+    matchedSkills: matchedSkillsNames,
     gaps: {
-      highPriority: highPriority,
-      mediumPriority: mediumPriority
+      highPriority: highPriorityGaps,
+      mediumPriority: mediumPriorityGaps
     },
     recommendations: recommendations,
     improvementPath: improvementPath
@@ -363,14 +428,7 @@ export default function JobMatchDemo() {
     if (selectedRole && SAMPLE_JOBS[selectedRole] && SAMPLE_JOBS[selectedRole].text.trim() === jobDescription.trim()) {
       matchedData = SAMPLE_JOBS[selectedRole];
     } else {
-      const foundRole = Object.keys(SAMPLE_JOBS).find(
-        (role) => SAMPLE_JOBS[role].text.trim() === jobDescription.trim()
-      );
-      if (foundRole) {
-        matchedData = SAMPLE_JOBS[foundRole];
-      } else {
-        matchedData = analyzeJobDescriptionText(jobDescription);
-      }
+      matchedData = analyzeJobDescriptionText(jobDescription, selectedRole);
     }
 
     // Step-by-step progress simulation (~1200ms total for polished feel)

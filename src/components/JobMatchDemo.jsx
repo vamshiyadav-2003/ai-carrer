@@ -213,6 +213,118 @@ const ANALYSIS_STEPS = [
   "Generating recommendations"
 ];
 
+// Helper to dynamically analyze custom pasted job descriptions
+function analyzeJobDescriptionText(text) {
+  const lower = text.toLowerCase();
+
+  // Dynamic Skill Detection
+  const knownSkills = [
+    { name: "SQL Data Querying", matched: lower.includes("sql") || lower.includes("query") || lower.includes("database") },
+    { name: "Python Scripting", matched: lower.includes("python") || lower.includes("pandas") || lower.includes("numpy") },
+    { name: "Power BI & Dashboards", matched: lower.includes("power bi") || lower.includes("tableau") || lower.includes("dashboard") },
+    { name: "React & Modern Web", matched: lower.includes("react") || lower.includes("frontend") || lower.includes("javascript") || lower.includes("typescript") },
+    { name: "AI / LLM Engineering", matched: lower.includes("ai") || lower.includes("ml") || lower.includes("pytorch") || lower.includes("llm") || lower.includes("rag") },
+    { name: "Agile & Requirements", matched: lower.includes("agile") || lower.includes("scrum") || lower.includes("business") || lower.includes("requirements") },
+    { name: "Excel & Financial Analysis", matched: lower.includes("excel") || lower.includes("finance") || lower.includes("reporting") },
+    { name: "Git & Version Control", matched: lower.includes("git") || lower.includes("github") || lower.includes("version control") },
+    { name: "A/B Testing & Statistics", matched: lower.includes("testing") || lower.includes("a/b") || lower.includes("stat") || lower.includes("experiment") },
+    { name: "Cloud & DevOps", matched: lower.includes("aws") || lower.includes("cloud") || lower.includes("docker") || lower.includes("ci/cd") }
+  ];
+
+  const matchedSkills = knownSkills.filter((s) => s.matched).map((s) => s.name);
+  if (matchedSkills.length === 0) {
+    matchedSkills.push("Problem Solving", "Domain Analysis", "Cross-Functional Collaboration", "Documentation", "Project Coordination");
+  }
+
+  // Detect role title based on text contents
+  let detectedTitle = "Custom Targeted Role";
+  if (lower.includes("frontend") || lower.includes("react") || lower.includes("web") || lower.includes("software")) {
+    detectedTitle = "Software / Frontend Engineer";
+  } else if (lower.includes("ai") || lower.includes("machine learning") || lower.includes("llm") || lower.includes("pytorch")) {
+    detectedTitle = "AI / ML Engineer";
+  } else if (lower.includes("business") || lower.includes("process") || lower.includes("stakeholder") || lower.includes("scrum")) {
+    detectedTitle = "Business Analyst";
+  } else if (lower.includes("data") || lower.includes("sql") || lower.includes("analytics") || lower.includes("tableau")) {
+    detectedTitle = "Data Analyst";
+  }
+
+  // Calculate dynamic score (76% to 94%) based on word count and keyword matches
+  const wordCount = text.trim().split(/\s+/).length;
+  const matchBonus = Math.min(18, matchedSkills.length * 3);
+  const lengthBonus = Math.min(6, Math.floor(wordCount / 15));
+  const score = Math.min(95, Math.max(76, 72 + matchBonus + lengthBonus));
+  const fitLabel = score >= 88 ? "Excellent Match" : score >= 81 ? "Strong Match" : "Good Match";
+
+  // Dynamic Skill Gaps based on missing technologies
+  const highPriority = [];
+  const mediumPriority = [];
+
+  if (!lower.includes("sql")) {
+    highPriority.push({ skill: "Advanced SQL Querying", current: "Intermediate", required: "Advanced" });
+  }
+  if (!lower.includes("power bi") && !lower.includes("tableau") && !lower.includes("dashboard")) {
+    highPriority.push({ skill: "BI & Executive Dashboarding", current: "Beginner", required: "Intermediate" });
+  }
+  if (!lower.includes("python") && !lower.includes("script")) {
+    mediumPriority.push({ skill: "Automated Data Scripting (Python)", current: "Beginner", required: "Intermediate" });
+  }
+  if (!lower.includes("testing") && !lower.includes("a/b")) {
+    mediumPriority.push({ skill: "A/B Testing & Statistical Rigor", current: "None", required: "Beginner" });
+  }
+
+  if (highPriority.length === 0) {
+    highPriority.push({ skill: "Advanced System Architecture", current: "Intermediate", required: "Advanced" });
+  }
+  if (mediumPriority.length === 0) {
+    mediumPriority.push({ skill: "CI/CD Pipeline Integration", current: "Beginner", required: "Intermediate" });
+  }
+
+  const recommendations = [
+    {
+      title: `Tailor Bullet Points for ${detectedTitle}`,
+      description: `Incorporate key terms found in this job description (${matchedSkills.slice(0, 3).join(", ")}) into your achievements.`
+    },
+    {
+      title: `Bridge ${highPriority[0].skill}`,
+      description: `Complete a targeted project demonstrating ${highPriority[0].skill} to move from ${highPriority[0].current} to ${highPriority[0].required}.`
+    },
+    {
+      title: "Add Quantifiable Impact Metrics",
+      description: "Quantify your achievements with percentage improvements, time saved, or revenue generated."
+    },
+    {
+      title: `Prepare ${detectedTitle} Technical Case Studies`,
+      description: "Practice answering role-specific scenario questions and system design/analytical trade-offs."
+    }
+  ];
+
+  const improvementPath = [
+    `Strengthen ${highPriority[0].skill} competency`,
+    `Build a portfolio proof-of-concept covering ${matchedSkills.slice(0, 2).join(" and ")}`,
+    `Refactor resume phrasing to highlight keywords present in this custom job posting`,
+    `Conduct mock interview practice targeting ${detectedTitle} technical standards`,
+    `Submit application with dynamic tailored match score of ${score}%`
+  ];
+
+  return {
+    text: text,
+    score: score,
+    fitLabel: fitLabel,
+    skillsMatchedCount: Math.min(11, matchedSkills.length + 3),
+    totalSkillsCount: 11,
+    skillsMissingCount: highPriority.length + mediumPriority.length,
+    experienceMatch: `${Math.min(96, score + 3)}%`,
+    explanation: `Your profile matches key requirements for ${detectedTitle}. Addressing ${highPriority[0].skill} will maximize your fit score.`,
+    matchedSkills: matchedSkills,
+    gaps: {
+      highPriority: highPriority,
+      mediumPriority: mediumPriority
+    },
+    recommendations: recommendations,
+    improvementPath: improvementPath
+  };
+}
+
 export default function JobMatchDemo() {
   const [jobDescription, setJobDescription] = useState(SAMPLE_JOBS["Data Analyst"].text);
   const [selectedRole, setSelectedRole] = useState("Data Analyst");
@@ -246,54 +358,20 @@ export default function JobMatchDemo() {
     setLoadingStep(0);
     setShowImprovePath(false);
 
-    // Dynamic analysis lookup or intelligent fallback matching
-    const matchedData = SAMPLE_JOBS[selectedRole] || {
-      text: jobDescription,
-      score: 82,
-      fitLabel: "Strong Match",
-      skillsMatchedCount: 8,
-      totalSkillsCount: 11,
-      skillsMissingCount: 3,
-      experienceMatch: "85%",
-      explanation: "You already match most of the core requirements. Strengthening SQL and Power BI would improve your fit.",
-      matchedSkills: ["SQL Fundamentals", "Data Querying", "Analytics", "Reporting", "Excel", "Problem Solving", "Team Collaboration", "Documentation"],
-      gaps: {
-        highPriority: [
-          { skill: "Advanced SQL", current: "Intermediate", required: "Advanced" },
-          { skill: "Power BI", current: "Beginner", required: "Intermediate" },
-          { skill: "Data Visualization", current: "Intermediate", required: "Advanced" }
-        ],
-        mediumPriority: [
-          { skill: "CRM Analytics", current: "None", required: "Beginner" },
-          { skill: "A/B Testing", current: "Beginner", required: "Intermediate" }
-        ]
-      },
-      recommendations: [
-        {
-          title: "Improve SQL",
-          description: "Practice joins, CTEs, window functions, and analytical queries."
-        },
-        {
-          title: "Build a Power BI Dashboard",
-          description: "Create a business analytics dashboard and add it to your portfolio."
-        },
-        {
-          title: "Improve Resume Keywords",
-          description: "Highlight relevant analytics skills and projects."
-        },
-        {
-          title: "Prepare for Interviews",
-          description: "Practice SQL, Excel, Power BI, and analytics case studies."
-        }
-      ],
-      improvementPath: [
-        "Improve Advanced SQL (CTEs & Window Functions)",
-        "Build one Power BI project & embed live dashboard link",
-        "Update resume keywords with quantified impact metrics",
-        "Practice relevant analytics & SQL interview case studies",
-        "Apply directly to target Data Analyst roles with tailored match"
-      ]
-    };
+    // Calculate dynamic analysis result based on input text
+    let matchedData = null;
+    if (selectedRole && SAMPLE_JOBS[selectedRole] && SAMPLE_JOBS[selectedRole].text.trim() === jobDescription.trim()) {
+      matchedData = SAMPLE_JOBS[selectedRole];
+    } else {
+      const foundRole = Object.keys(SAMPLE_JOBS).find(
+        (role) => SAMPLE_JOBS[role].text.trim() === jobDescription.trim()
+      );
+      if (foundRole) {
+        matchedData = SAMPLE_JOBS[foundRole];
+      } else {
+        matchedData = analyzeJobDescriptionText(jobDescription);
+      }
+    }
 
     // Step-by-step progress simulation (~1200ms total for polished feel)
     const interval = setInterval(() => {
